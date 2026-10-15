@@ -1,0 +1,47 @@
+# ==================== 密钥：绝对不要提交 ====================
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# ==================== Python ====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# ==================== 运行时数据（会话记录、向量库） ====================
+memory_data/
+chromadb/
+*.db
+*.sqlite3
+
+# ==================== 前端 ====================
+node_modules/
+travel-plan-web/node_modules/
+travel-plan-web/dist/
+travel-plan-web/.vite/
+
+# ==================== 大文件：本地嵌入模型（约 4.4GB） ====================
+# 不入库，改用 download_model.py 按需下载（或用哈希嵌入兜底）
+travel_plan_agent/paraphrase-multilingual-MiniLM-L12-v2/
+
+# ==================== 编辑器 / 系统 ====================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+
+# ==================== 与本项目无关的学习资料 ====================
+# 如需一起上传，删除下面两行
+记忆/
+课程学习/

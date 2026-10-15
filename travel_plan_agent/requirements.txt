@@ -1,0 +1,29 @@
+# travel_plan_agent 运行依赖
+# 安装：pip install -r requirements.txt
+# 说明：短期记忆（SQLite）只用标准库 sqlite3，长期记忆（Chroma）使用本地持久化，
+#      嵌入模型已随包附带（travel_plan_agent/paraphrase-multilingual-MiniLM-L12-v2），
+#      运行过程完全离线，不需要额外安装数据库软件，也不需要下载模型。
+
+# ---- Agent / 模型 / 工具 ----
+langchain>=1.0
+langchain-core>=1.0
+langchain-openai>=1.0
+langchain-tavily>=0.2
+langgraph>=1.0
+langgraph-checkpoint-sqlite>=3.0
+pydantic>=2.7
+pydantic-settings>=2.3
+
+# ---- 长期记忆：Chroma 向量库 ----
+chromadb>=1.0
+
+# ---- 长期记忆：本地嵌入模型（读取包内模型目录，不联网下载） ----
+sentence-transformers>=5.0
+
+# 如需 CPU 版 torch（默认可能装成 CUDA 版），可先执行：
+# pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+# ---- HTTP 接口层（供前端调用）----
+fastapi>=0.110
+uvicorn[standard]>=0.30
+sse-starlette>=2.0

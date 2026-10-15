@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "travel-plan-agent"
+version = "0.1.0"
+description = "AI 旅行规划助手：LangGraph Agent + 短期/长期双层记忆 + React 前端"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    # Agent / 模型 / 工具
+    "langchain>=1.0",
+    "langchain-core>=1.0",
+    "langchain-openai>=1.0",
+    "langchain-tavily>=0.2",
+    "langgraph>=1.0",
+    "langgraph-checkpoint-sqlite>=3.0",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    # 长期记忆：Chroma + 本地嵌入
+    "chromadb>=1.0",
+    "sentence-transformers>=5.0",
+    # HTTP 接口层
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.30",
+    "sse-starlette>=2.0",
+]
+
+[project.scripts]
+travel-plan-agent = "travel_plan_agent.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["travel_plan_agent*"]
+
+[tool.setuptools.package-data]
+travel_plan_agent = [
+    # 前端构建产物（由 travel-plan-web 的 npm run build:agent 生成）
+    "webui/**/*",
+    # 随包携带的本地嵌入模型，保证离线可用
+    "paraphrase-multilingual-MiniLM-L12-v2/**/*",
+    # 配置模板
+    ".env.example",
+]
