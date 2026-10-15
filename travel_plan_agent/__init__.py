@@ -15,13 +15,13 @@ from travel_plan_agent.build_agent import build_agent
 from travel_plan_agent.config import BASE_DIR, Settings, get_settings
 from travel_plan_agent.model import get_model
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "BASE_DIR",
     "Settings",
+    "__version__",
     "build_agent",
     "get_model",
     "get_settings",
-    "__version__",
 ]
