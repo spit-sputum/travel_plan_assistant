@@ -27,7 +27,7 @@ from fastapi.staticfiles import StaticFiles
 
 from travel_plan_agent import __version__
 from travel_plan_agent.api import chat_router
-from travel_plan_agent.api.deps import warmup
+from travel_plan_agent.api.deps import agent_ready, config_error, warmup
 from travel_plan_agent.api.schemas import ApiResponse
 from travel_plan_agent.config import get_settings
 from travel_plan_agent.tools.all_tools import ALL_TOOLS
@@ -70,6 +70,8 @@ def health() -> dict:
         data={
             "status": "ok",
             "version": __version__,
+            "agentReady": agent_ready(),
+            "configIssue": config_error(),
             "provider": settings.model_provider,
             "model": settings.model_name or "(该供应商默认模型)",
             "tools": len(ALL_TOOLS),

@@ -20,7 +20,7 @@ from typing import Any, AsyncIterator
 from fastapi import APIRouter, Query
 from sse_starlette.sse import EventSourceResponse
 
-from travel_plan_agent.api.deps import get_agent
+from travel_plan_agent.api.deps import require_agent
 from travel_plan_agent.api.schemas import (
     ApiResponse,
     ChatData,
@@ -113,7 +113,7 @@ def _extract_tool_meta(
 
 def _run_agent(message: str, conversation_id: str, user_id: str) -> list[Any]:
     """同步执行一轮对话，返回全部消息。"""
-    agent = get_agent()
+    agent = require_agent()
     result = agent.invoke(
         {"messages": [{"role": "user", "content": message}]},
         config={"configurable": {"thread_id": conversation_id, "user_id": user_id}},
@@ -179,7 +179,10 @@ def chat_message(req: ChatRequest) -> dict[str, Any]:
     user_id = (req.user_id or "").strip() or "default_user"
 
     started = time.time()
-    messages = _run_agent(message, conversation_id, user_id)
+    try:
+        messages = _run_agent(message, conversation_id, user_id)
+    except Exception as exc:  # noqa: BLE001 - 配置缺失 / 初始化失败时返回中文提示
+        return ApiResponse(code=503, success=False, message=str(exc)).model_dump()
     turn = _current_turn_messages(messages)
     tool_calls, tool_results = _extract_tool_meta(turn)
 
@@ -209,11 +212,16 @@ async def chat_stream(req: ChatRequest) -> EventSourceResponse:
         return {"event": event, "data": json.dumps(payload, ensure_ascii=False, default=str)}
 
     async def event_generator() -> AsyncIterator[dict[str, str]]:
-        agent = get_agent()
         answer_parts: list[str] = []  # 累积本轮回答，结束时写入短期记忆
         yield sse("start", {"conversationId": conversation_id, "messageId": message_id})
         if not message:
             yield sse("error", {"error": "message 不能为空"})
+            yield sse("done", {"conversationId": conversation_id, "messageId": message_id})
+            return
+        try:
+            agent = require_agent()
+        except Exception as exc:  # noqa: BLE001 - 配置缺失时通过事件告知前端
+            yield sse("error", {"error": str(exc)})
             yield sse("done", {"conversationId": conversation_id, "messageId": message_id})
             return
         # 说明：checkpointer 用的是同步 SqliteSaver，不支持异步接口，
